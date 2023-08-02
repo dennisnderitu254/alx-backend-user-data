@@ -428,4 +428,4 @@ bob@dylan:~$
 
 - GitHub repository: `alx-backend-user-data`
 - Directory: `0x00-personal_data`
-- File: `encrypt_password.py`01~
+- File: `encrypt_password.py`
