@@ -1,42 +1,47 @@
 #!/usr/bin/env python3
-"""
-Auth class
-"""
-
-from tabnanny import check
+""" Auth module """
 from flask import request
-from typing import TypeVar, List
-User = TypeVar('User')
+from typing import List, TypeVar
+from models.user import User
 
 
 class Auth:
-    """
-    A class to manage the API authentication
-    """
+    """ class auth for authenticating users"""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """
-        return False - path and excluded_paths
-        """
-        check = path
-        if path is None or excluded_paths is None or len(excluded_paths) == 0:
+        """ require auth function that returns false"""
+        if excluded_paths and path:
+            if path[-1] == '/':
+                new_path = path[:-1]
+            else:
+                new_path = path
+            new_excluded_path = []
+            for element in excluded_paths:
+                if element[-1] == '/':
+                    new_excluded_path.append(element[:-1])
+                if element[-1] == '*':
+                    if new_path.startswith(element[:-1]):
+                        return False
+
+            if new_path not in new_excluded_path:
+                return True
+            else:
+                return False
+        if path is None:
             return True
-        if path[-1] != "/":
-            check += "/"
-        if check in excluded_paths or path in excluded_paths:
-            return False
-        return True
+        if not excluded_paths:
+            return True
 
     def authorization_header(self, request=None) -> str:
-        """
-        return None - request
-        """
+        """ authorization header"""
         if request is None:
             return None
-        return request.headers.get("Authorization")
+        authorization = request.headers.get('Authorization')
+        if authorization is None:
+            return None
+        else:
+            return authorization
 
-    def current_user(self, request=None) -> User:
-        """
-        Return None - request
-        """
+    def current_user(self, request=None) -> TypeVar('User'):
+        """ return current user else None"""
         return None
