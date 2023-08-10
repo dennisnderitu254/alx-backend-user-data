@@ -25,22 +25,6 @@ elif getenv("AUTH_TYPE") == "session_auth":
     auth = SessionAuth()
 
 
-@app.before_request
-def before_request():
-    """
-    handler before_request
-    """
-    authorized_list = ['/api/v1/status',
-                       '/api/v1/unauthorized/', '/api/v1/forbidden']
-
-    if auth and auth.require_auth(request.path, authorized_list):
-        if not auth.authorization_header(request):
-            abort(401)
-        request.current_user = auth.current_user(request)
-        if not request.current_user:
-            abort(403)
-
-
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler
@@ -62,6 +46,27 @@ def forbidden(error) -> str:
     Forbidden handler.
     """
     return jsonify({"error": "Forbidden"}), 403
+
+
+@app.before_request
+def before_request() -> None:
+    """ Filter for request
+    """
+    request_path_list = [
+        '/api/v1/status/',
+        '/api/v1/unauthorized/',
+        '/api/v1/forbidden/',
+        '/api/v1/auth_session/login/']
+    if auth:
+        if auth.require_auth(request.path, request_path_list):
+            if auth.authorization_header(
+                    request) is None and auth.session_cookie(request) is None:
+                abort(401)
+            request.current_user = auth.current_user(request)
+            if auth.current_user(request) is None:
+                abort(403)
+            if request.current_user is None:
+                abort(403)
 
 
 if __name__ == "__main__":
