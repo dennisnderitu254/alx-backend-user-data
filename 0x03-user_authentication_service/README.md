@@ -267,6 +267,29 @@ from user import User
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 
+
 my_db = DB()
 
 email = 'test@test.com'
+hashed_password = "hashedPwd"
+
+user = my_db.add_user(email, hashed_password)
+print(user.id)
+
+try:
+    my_db.update_user(user.id, hashed_password='NewPwd')
+    print("Password updated")
+except ValueError:
+    print("Error")
+
+bob@dylan:~$ python3 main.py
+1
+Password updated
+bob@dylan:~$
+```
+
+**Repo:**
+
+-   GitHub repository: `alx-backend-user-data`
+-   Directory: `0x03-user_authentication_service`
+-   File: `db.py`
